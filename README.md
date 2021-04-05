@@ -5,3 +5,8 @@
 - 动态菜单，通过菜单管理统一管理访问路由
 - 数据切换，通过mock配置对接口数据／mock模拟数据进行切换
 - 发布时，可动态配置CDN静态资源／切换新旧版本
+
+# 拦截器功能
+    https://github.com/the-little-pepper/gcsj_group21/blob/main/src/utils/httpRequest.js和https://github.com/the-little-pepper/gcsj_group21/blob/main/src/router/index.js
+# REST API调用请求源文件URL
+    https://github.com/the-little-pepper/gcsj_group21/blob/main/src/utils/httpRequest.js
