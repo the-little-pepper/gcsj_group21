@@ -44,9 +44,7 @@ const mainRoutes = {
     // console.log(url)
     if (!url.startswith('http://') && !url.startswith('https://')) {
       next()
-      return
-    }
-    if (!token || !/\S/.test(token)) {
+    } else if (!token || !/\S/.test(token)) {
       clearLoginInfo()
       next({ name: 'login' })
     }
