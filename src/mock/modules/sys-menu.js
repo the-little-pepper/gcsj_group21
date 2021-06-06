@@ -57,7 +57,7 @@ var dataList = [
     'parentId': 1,
     'parentName': '系统管理',
     'name': 'SQL监控',
-    'url': 'http://3l5a371571.qicp.vip/renren-fast/druid/sql.html',
+    'url': 'http://121.5.102.246:8080/renren-fast/druid/sql.html',
     'perms': null,
     'type': 1,
     'icon': 'sql',

@@ -23,46 +23,58 @@
         width="50">
       </el-table-column>
       <el-table-column
-        prop="teacherSignId"
+        prop="id"
         header-align="center"
         align="center"
         label="教师发起签到ID">
       </el-table-column>
       <el-table-column
-        prop="teacherId"
-        header-align="center"
-        align="center"
-        label="教师ID">
-      </el-table-column>
-      <el-table-column
         prop="courseId"
         header-align="center"
         align="center"
-        label="班课ID">
+        label="课程id">
+      </el-table-column>
+      <el-table-column
+        prop="teacherId"
+        header-align="center"
+        align="center"
+        label="教师id">
+      </el-table-column>
+      <el-table-column
+        prop="type"
+        header-align="center"
+        align="center"
+        label="签到类型">
       </el-table-column>
       <el-table-column
         prop="startTime"
         header-align="center"
         align="center"
-        label="开始时间">
+        label="签到开始时间">
       </el-table-column>
       <el-table-column
         prop="stopTime"
         header-align="center"
         align="center"
-        label="结束时间">
+        label="签到结束时间">
       </el-table-column>
       <el-table-column
-        prop="ipaddr"
+        prop="latitude"
         header-align="center"
         align="center"
-        label="发起签到IP地址">
+        label="纬度">
       </el-table-column>
       <el-table-column
-        prop="remark"
+        prop="longitude"
         header-align="center"
         align="center"
-        label="备注">
+        label="经度">
+      </el-table-column>
+      <el-table-column
+        prop="finished"
+        header-align="center"
+        align="center"
+        label="一键签到结束标志 0是结束 1还在签到中">
       </el-table-column>
       <el-table-column
         fixed="right"
@@ -71,8 +83,8 @@
         width="150"
         label="操作">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.teacherSignId)">修改</el-button>
-          <el-button type="text" size="small" @click="deleteHandle(scope.row.teacherSignId)">删除</el-button>
+          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
+          <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -126,7 +138,7 @@
             'key': this.dataForm.key
           })
         }).then(({data}) => {
-          if (data && data.code === 0) {
+          if (data && data.code === 200) {
             this.dataList = data.page.list
             this.totalPage = data.page.totalCount
           } else {
@@ -161,7 +173,7 @@
       // 删除
       deleteHandle (id) {
         var ids = id ? [id] : this.dataListSelections.map(item => {
-          return item.teacherSignId
+          return item.id
         })
         this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '删除' : '批量删除'}]操作?`, '提示', {
           confirmButtonText: '确定',
@@ -173,7 +185,7 @@
             method: 'post',
             data: this.$http.adornData(ids, false)
           }).then(({data}) => {
-            if (data && data.code === 0) {
+            if (data && data.code === 200) {
               this.$message({
                 message: '操作成功',
                 type: 'success',

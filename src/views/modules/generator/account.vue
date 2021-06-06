@@ -6,8 +6,8 @@
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
-        <el-button v-if="isAuth('generator:clacourseteacher:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
-        <el-button v-if="isAuth('generator:clacourseteacher:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
+        <el-button v-if="isAuth('generator:account:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
+        <el-button v-if="isAuth('generator:account:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
     </el-form>
     <el-table
@@ -23,58 +23,42 @@
         width="50">
       </el-table-column>
       <el-table-column
-        prop="courseId"
+        prop="id"
         header-align="center"
         align="center"
-        label="班课ID">
+        label="账号表id">
       </el-table-column>
       <el-table-column
-        prop="teacherId"
+        prop="userId"
         header-align="center"
         align="center"
-        label="任课教师ID">
+        label="用户表id">
       </el-table-column>
       <el-table-column
-        prop="sign"
+        prop="type"
         header-align="center"
         align="center"
-        label="发起签到次数">
+        :formatter="formatType"
+        label="账号类型">
       </el-table-column>
       <el-table-column
-        prop="fullExp"
+        prop="userName"
         header-align="center"
         align="center"
-        label="满经验值">
+        label="用户名包括邮箱手机号等">
       </el-table-column>
       <el-table-column
-        prop="createBy"
+        prop="password"
         header-align="center"
         align="center"
-        label="创建者">
+        label="密码">
       </el-table-column>
       <el-table-column
-        prop="createTime"
+        prop="status"
         header-align="center"
+        :formatter="formatBan"
         align="center"
-        label="创建时间">
-      </el-table-column>
-      <el-table-column
-        prop="updateBy"
-        header-align="center"
-        align="center"
-        label="更新者">
-      </el-table-column>
-      <el-table-column
-        prop="updateTime"
-        header-align="center"
-        align="center"
-        label="更新时间">
-      </el-table-column>
-      <el-table-column
-        prop="remark"
-        header-align="center"
-        align="center"
-        label="备注">
+        label="禁用标志">
       </el-table-column>
       <el-table-column
         fixed="right"
@@ -83,8 +67,8 @@
         width="150"
         label="操作">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.courseId)">修改</el-button>
-          <el-button type="text" size="small" @click="deleteHandle(scope.row.courseId)">删除</el-button>
+          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
+          <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -103,7 +87,7 @@
 </template>
 
 <script>
-  import AddOrUpdate from './clacourseteacher-add-or-update'
+  import AddOrUpdate from './account-add-or-update'
   export default {
     data () {
       return {
@@ -116,7 +100,8 @@
         totalPage: 0,
         dataListLoading: false,
         dataListSelections: [],
-        addOrUpdateVisible: false
+        addOrUpdateVisible: false,
+        sysdict: {}
       }
     },
     components: {
@@ -126,11 +111,35 @@
       this.getDataList()
     },
     methods: {
+      formatType: function (row, column) {
+        return this.sysdict['account_type'][row.type]
+      },
+      formatBan: function (row, column) {
+        return row.status === '1' ? '正常' : '禁用'
+      },
       // 获取数据列表
-      getDataList () {
+      async getDataList () {
         this.dataListLoading = true
+        // 获得数据字典
+        const {data} = await this.$http({
+          url: this.$http.adornUrl('/sysdict/list'),
+          method: 'get',
+          params: this.$http.adornParams({
+            'page': this.pageIndex,
+            'limit': 200,
+            'key': this.dataForm.key
+          })
+        })
+        for (let item of data.page.list) {
+          console.log(item.code, item.type, item.value)
+          if (!this.sysdict[item.type]) {
+            this.sysdict[item.type] = {}
+          }
+          this.sysdict[item.type][item.code] = item.value
+        }
+
         this.$http({
-          url: this.$http.adornUrl('/generator/clacourseteacher/list'),
+          url: this.$http.adornUrl('/generator/account/list'),
           method: 'get',
           params: this.$http.adornParams({
             'page': this.pageIndex,
@@ -173,7 +182,7 @@
       // 删除
       deleteHandle (id) {
         var ids = id ? [id] : this.dataListSelections.map(item => {
-          return item.courseId
+          return item.id
         })
         this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '删除' : '批量删除'}]操作?`, '提示', {
           confirmButtonText: '确定',
@@ -181,7 +190,7 @@
           type: 'warning'
         }).then(() => {
           this.$http({
-            url: this.$http.adornUrl('/generator/clacourseteacher/delete'),
+            url: this.$http.adornUrl('/generator/account/delete'),
             method: 'post',
             data: this.$http.adornData(ids, false)
           }).then(({data}) => {

@@ -34,15 +34,13 @@ const mainRoutes = {
     // 2. iframeUrl: 是否通过iframe嵌套展示内容, '以http[s]://开头': 是, '': 否
     // 提示: 如需要通过iframe嵌套展示内容, 但不通过tab打开, 请自行创建组件使用iframe处理!
     { path: '/home', component: _import('common/home'), name: 'home', meta: { title: '首页' } }
-    // { path: '/theme', component: _import('common/theme'), name: 'theme', meta: { title: '主题' } },
-    // { path: '/demo-echarts', component: _import('demo/echarts'), name: 'demo-echarts', meta: { title: 'demo-echarts', isTab: true } },
-    // { path: '/demo-ueditor', component: _import('demo/ueditor'), name: 'demo-ueditor', meta: { title: 'demo-ueditor', isTab: true } }
+    // { path: '/theme', component: _import('common/theme'), name: 'theme', meta: { title: '主题' } }
   ],
   beforeEnter (to, from, next) {
     let token = Vue.cookie.get('token')
     let url = window.location.href
     // console.log(url)
-    if (!url.startswith('http://') && !url.startswith('https://')) {
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
       next()
     } else if (!token || !/\S/.test(token)) {
       clearLoginInfo()
@@ -64,7 +62,7 @@ router.beforeEach((to, from, next) => {
   // 1. 已经添加 or 全局路由, 直接访问
   // 2. 获取菜单列表, 添加并保存本地存储
   let url = window.location.href
-  if (!url.startswith('http://') && !url.startswith('https://')) {
+  if (!url.startsWith('http://') && !url.startsWith('https://')) {
     console.log(`url解析不是http或https协议，重新跳转登录页`)
     router.push({ name: 'login' })
   }
@@ -77,7 +75,7 @@ router.beforeEach((to, from, next) => {
       method: 'get',
       params: http.adornParams()
     }).then(({data}) => {
-      if (data && data.code === 0) {
+      if (data && data.code === 200) {
         fnAddDynamicMenuRoutes(data.menuList)
         router.options.isAddDynamicMenuRoutes = true
         sessionStorage.setItem('menuList', JSON.stringify(data.menuList || '[]'))

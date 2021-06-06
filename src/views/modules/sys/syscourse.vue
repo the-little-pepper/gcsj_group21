@@ -6,8 +6,8 @@
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
-        <el-button v-if="isAuth('generator:clacourseteacher:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
-        <el-button v-if="isAuth('generator:clacourseteacher:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
+        <el-button v-if="isAuth('generator:syscourse:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
+        <el-button v-if="isAuth('generator:syscourse:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
     </el-form>
     <el-table
@@ -23,58 +23,16 @@
         width="50">
       </el-table-column>
       <el-table-column
-        prop="courseId"
+        prop="id"
         header-align="center"
         align="center"
-        label="班课ID">
+        label="id">
       </el-table-column>
       <el-table-column
-        prop="teacherId"
+        prop="name"
         header-align="center"
         align="center"
-        label="任课教师ID">
-      </el-table-column>
-      <el-table-column
-        prop="sign"
-        header-align="center"
-        align="center"
-        label="发起签到次数">
-      </el-table-column>
-      <el-table-column
-        prop="fullExp"
-        header-align="center"
-        align="center"
-        label="满经验值">
-      </el-table-column>
-      <el-table-column
-        prop="createBy"
-        header-align="center"
-        align="center"
-        label="创建者">
-      </el-table-column>
-      <el-table-column
-        prop="createTime"
-        header-align="center"
-        align="center"
-        label="创建时间">
-      </el-table-column>
-      <el-table-column
-        prop="updateBy"
-        header-align="center"
-        align="center"
-        label="更新者">
-      </el-table-column>
-      <el-table-column
-        prop="updateTime"
-        header-align="center"
-        align="center"
-        label="更新时间">
-      </el-table-column>
-      <el-table-column
-        prop="remark"
-        header-align="center"
-        align="center"
-        label="备注">
+        label="课程名">
       </el-table-column>
       <el-table-column
         fixed="right"
@@ -83,8 +41,8 @@
         width="150"
         label="操作">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.courseId)">修改</el-button>
-          <el-button type="text" size="small" @click="deleteHandle(scope.row.courseId)">删除</el-button>
+          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
+          <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -103,7 +61,7 @@
 </template>
 
 <script>
-  import AddOrUpdate from './clacourseteacher-add-or-update'
+  import AddOrUpdate from './syscourse-add-or-update'
   export default {
     data () {
       return {
@@ -130,7 +88,7 @@
       getDataList () {
         this.dataListLoading = true
         this.$http({
-          url: this.$http.adornUrl('/generator/clacourseteacher/list'),
+          url: this.$http.adornUrl('/syscourse/list'),
           method: 'get',
           params: this.$http.adornParams({
             'page': this.pageIndex,
@@ -173,7 +131,7 @@
       // 删除
       deleteHandle (id) {
         var ids = id ? [id] : this.dataListSelections.map(item => {
-          return item.courseId
+          return item.id
         })
         this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '删除' : '批量删除'}]操作?`, '提示', {
           confirmButtonText: '确定',
@@ -181,7 +139,7 @@
           type: 'warning'
         }).then(() => {
           this.$http({
-            url: this.$http.adornUrl('/generator/clacourseteacher/delete'),
+            url: this.$http.adornUrl('/syscourse/delete'),
             method: 'post',
             data: this.$http.adornData(ids, false)
           }).then(({data}) => {

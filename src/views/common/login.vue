@@ -10,7 +10,7 @@
           <h3 class="login-title">管理员登录</h3>
           <el-form :model="dataForm" :rules="!loginmethod ? dataRule : coderule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" status-icon>
             <el-form-item prop="userName">
-              <el-input v-if="!loginmethod" v-model="dataForm.userName" placeholder="手机号" style="width: 100%"></el-input>
+              <el-input v-if="!loginmethod" v-model="dataForm.userName" placeholder="手机号或账号" style="width: 100%"></el-input>
               <el-input v-if="loginmethod" v-model="dataForm.userName" placeholder="手机号" style="width: 65%"></el-input>
               <el-button v-if="loginmethod" @click="sendCode" :disabled="!show"><span v-if="show">发送验证码</span><span v-if="!show">剩余 {{count}} (s)</span></el-button>
             </el-form-item>
@@ -47,7 +47,7 @@
               <span>自动登录</span> -->
             </div>
             <div class="forget">
-              <span @click="handleReg">前往注册</span>
+              <!-- <span @click="handleReg">前往注册</span> -->
               <!-- <span>忘记密码</span> -->
               <span @click="alterLoginMethod">{{
                 !loginmethod ? "验证码登录" : "密码登录"
@@ -133,7 +133,7 @@
                   'captcha': this.dataForm.captcha
                 })
               }).then(({data}) => {
-                if (data && data.code === 0) {
+                if (data && data.code === 200) {
                   this.$cookie.set('token', data.token)
                   this.$router.replace({ name: 'home' })
                 } else {
@@ -155,7 +155,7 @@
                   'uuid': this.dataForm.uuid
                 })
               }).then(({data}) => {
-                if (data && data.code === 0) {
+                if (data && data.code === 200) {
                   this.$cookie.set('token', data.token)
                   this.$router.replace({ name: 'home' })
                 } else {
@@ -179,16 +179,16 @@
         this.loginmethod = !this.loginmethod
         this.getCaptcha()
       },
+      // 获取手机验证码
       sendCode () {
         this.$http({
           url: this.$http.adornUrl('/app/user/checkCode'),
           method: 'post',
           data: this.$http.adornData({
-            'phonenumber': this.dataForm.userName,
-            'uuid': this.dataForm.uuid
+            'phonenumber': this.dataForm.userName
           })
         }).then(({data}) => {
-          if (data && data.code === 0) {
+          if (data && data.code === 200) {
             this.$message({
               message: '发送成功',
               type: 'success'

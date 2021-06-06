@@ -74,7 +74,8 @@
         prop="status"
         header-align="center"
         align="center"
-        label="0 禁用 1正常">
+        :formatter="formatBan"
+        label="状态">
       </el-table-column>
       <el-table-column
         fixed="right"
@@ -126,11 +127,14 @@
       this.getDataList()
     },
     methods: {
+      formatBan: function (row, column) {
+        return row.status === 1 ? '正常' : '禁用'
+      },
       // 获取数据列表
       getDataList () {
         this.dataListLoading = true
         this.$http({
-          url: this.$http.adornUrl('/generator/sysdict/list'),
+          url: this.$http.adornUrl('/sysdict/list'),
           method: 'get',
           params: this.$http.adornParams({
             'page': this.pageIndex,
@@ -138,7 +142,7 @@
             'key': this.dataForm.key
           })
         }).then(({data}) => {
-          if (data && data.code === 0) {
+          if (data && data.code === 200) {
             this.dataList = data.page.list
             this.totalPage = data.page.totalCount
           } else {
@@ -181,11 +185,11 @@
           type: 'warning'
         }).then(() => {
           this.$http({
-            url: this.$http.adornUrl('/generator/sysdict/delete'),
+            url: this.$http.adornUrl('/sysdict/delete'),
             method: 'post',
             data: this.$http.adornData(ids, false)
           }).then(({data}) => {
-            if (data && data.code === 0) {
+            if (data && data.code === 200) {
               this.$message({
                 message: '操作成功',
                 type: 'success',

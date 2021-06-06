@@ -88,11 +88,11 @@
           this.$refs['dataForm'].resetFields()
           if (this.dataForm.id) {
             this.$http({
-              url: this.$http.adornUrl(`/generator/sysdict/info/${this.dataForm.id}`),
+              url: this.$http.adornUrl(`/sysdict/info/${this.dataForm.id}`),
               method: 'get',
               params: this.$http.adornParams()
             }).then(({data}) => {
-              if (data && data.code === 0) {
+              if (data && data.code === 200) {
                 this.dataForm.name = data.sysDict.name
                 this.dataForm.type = data.sysDict.type
                 this.dataForm.code = data.sysDict.code
@@ -111,7 +111,7 @@
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
             this.$http({
-              url: this.$http.adornUrl(`/generator/sysdict/${!this.dataForm.id ? 'save' : 'update'}`),
+              url: this.$http.adornUrl(`/sysdict/${!this.dataForm.id ? 'save' : 'update'}`),
               method: 'post',
               data: this.$http.adornData({
                 'id': this.dataForm.id || undefined,
@@ -125,7 +125,7 @@
                 'status': this.dataForm.status
               })
             }).then(({data}) => {
-              if (data && data.code === 0) {
+              if (data && data.code === 200) {
                 this.$message({
                   message: '操作成功',
                   type: 'success',

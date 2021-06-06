@@ -29,25 +29,13 @@
         label="用户ID">
       </el-table-column>
       <el-table-column
-        prop="uniacadaId"
-        header-align="center"
-        align="center"
-        label="学校系ID">
-      </el-table-column>
-      <el-table-column
         prop="userName"
         header-align="center"
         align="center"
-        label="用户账号">
+        label="用户名">
       </el-table-column>
       <el-table-column
-        prop="nickName"
-        header-align="center"
-        align="center"
-        label="用户昵称">
-      </el-table-column>
-      <el-table-column
-        prop="studentNum"
+        prop="eduNum"
         header-align="center"
         align="center"
         label="学号">
@@ -56,61 +44,35 @@
         prop="userType"
         header-align="center"
         align="center"
+        :formatter="formatUsertype"
         label="用户类型">
       </el-table-column>
       <el-table-column
-        prop="email"
+        prop="sex"
         header-align="center"
         align="center"
-        label="用户邮箱">
+        :formatter="formatSex"
+        label="性别">
       </el-table-column>
       <el-table-column
-        prop="phonenumber"
+        prop="nickName"
         header-align="center"
         align="center"
-        label="手机号码">
+        label="用户昵称">
       </el-table-column>
-      <el-table-column
-        prop="avatar"
-        header-align="center"
-        align="center"
-        label="头像地址">
-      </el-table-column>
-      <el-table-column
-        prop="password"
-        header-align="center"
-        align="center"
-        label="密码">
-      </el-table-column>
-      <el-table-column
-        prop="status"
-        header-align="center"
-        align="center"
-        label="帐号状态（0正常 1停用）">
-      </el-table-column>
-      <el-table-column
-        prop="delFlag"
-        header-align="center"
-        align="center"
-        label="删除标志（0代表存在 2代表删除）">
-      </el-table-column>
-      <el-table-column
-        prop="loginIp"
-        header-align="center"
-        align="center"
-        label="最后登陆IP">
-      </el-table-column>
+      <!--
+        <el-table-column
+          prop="uniacadaId"
+          header-align="center"
+          align="center"
+          label="学校系ID">
+        </el-table-column>
+      -->
       <el-table-column
         prop="loginDate"
         header-align="center"
         align="center"
         label="最后登陆时间">
-      </el-table-column>
-      <el-table-column
-        prop="createBy"
-        header-align="center"
-        align="center"
-        label="创建者">
       </el-table-column>
       <el-table-column
         prop="createTime"
@@ -119,16 +81,22 @@
         label="创建时间">
       </el-table-column>
       <el-table-column
-        prop="updateBy"
+        prop="createBy"
         header-align="center"
         align="center"
-        label="更新者">
+        label="创建者">
       </el-table-column>
       <el-table-column
         prop="updateTime"
         header-align="center"
         align="center"
         label="更新时间">
+      </el-table-column>
+      <el-table-column
+        prop="updateBy"
+        header-align="center"
+        align="center"
+        label="更新者">
       </el-table-column>
       <el-table-column
         prop="remark"
@@ -176,7 +144,8 @@
         totalPage: 0,
         dataListLoading: false,
         dataListSelections: [],
-        addOrUpdateVisible: false
+        addOrUpdateVisible: false,
+        sysdict: {}
       }
     },
     components: {
@@ -186,9 +155,33 @@
       this.getDataList()
     },
     methods: {
+      formatSex: function (row, column) {
+        return this.sysdict['sex_type'][row.sex]
+      },
+      formatUsertype: function (row, column) {
+        return this.sysdict['user_type'][row.userType]
+      },
       // 获取数据列表
-      getDataList () {
+      async getDataList () {
         this.dataListLoading = true
+        // 获得数据字典
+        const {data} = await this.$http({
+          url: this.$http.adornUrl('/sysdict/list'),
+          method: 'get',
+          params: this.$http.adornParams({
+            'page': this.pageIndex,
+            'limit': 200,
+            'key': this.dataForm.key
+          })
+        })
+        for (let item of data.page.list) {
+          console.log(item.code, item.type, item.value)
+          if (!this.sysdict[item.type]) {
+            this.sysdict[item.type] = {}
+          }
+          this.sysdict[item.type][item.code] = item.value
+        }
+
         this.$http({
           url: this.$http.adornUrl('/generator/user/list'),
           method: 'get',
@@ -198,7 +191,7 @@
             'key': this.dataForm.key
           })
         }).then(({data}) => {
-          if (data && data.code === 0) {
+          if (data && data.code === 200) {
             this.dataList = data.page.list
             this.totalPage = data.page.totalCount
           } else {
@@ -245,7 +238,7 @@
             method: 'post',
             data: this.$http.adornData(ids, false)
           }).then(({data}) => {
-            if (data && data.code === 0) {
+            if (data && data.code === 200) {
               this.$message({
                 message: '操作成功',
                 type: 'success',

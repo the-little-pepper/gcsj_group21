@@ -23,34 +23,58 @@
         width="50">
       </el-table-column>
       <el-table-column
-        prop="studentSignId"
+        prop="id"
         header-align="center"
         align="center"
-        label="学生签到记录ID">
+        label="接收签到表id">
+      </el-table-column>
+      <el-table-column
+        prop="taskId"
+        header-align="center"
+        align="center"
+        label="老师发起签到的表id">
       </el-table-column>
       <el-table-column
         prop="studentId"
         header-align="center"
         align="center"
-        label="学生ID">
+        label="学生id">
       </el-table-column>
       <el-table-column
         prop="courseId"
         header-align="center"
         align="center"
-        label="班课ID">
+        label="课程id">
+      </el-table-column>
+      <el-table-column
+        prop="type"
+        header-align="center"
+        align="center"
+        label="签到类型">
+      </el-table-column>
+      <el-table-column
+        prop="longitude"
+        header-align="center"
+        align="center"
+        label="经度">
+      </el-table-column>
+      <el-table-column
+        prop="latitude"
+        header-align="center"
+        align="center"
+        label="纬度">
+      </el-table-column>
+      <el-table-column
+        prop="experience"
+        header-align="center"
+        align="center"
+        label="经验值">
       </el-table-column>
       <el-table-column
         prop="signTime"
         header-align="center"
         align="center"
         label="签到时间">
-      </el-table-column>
-      <el-table-column
-        prop="ipaddr"
-        header-align="center"
-        align="center"
-        label="签到IP地址">
       </el-table-column>
       <el-table-column
         prop="remark"
@@ -65,8 +89,8 @@
         width="150"
         label="操作">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.studentSignId)">修改</el-button>
-          <el-button type="text" size="small" @click="deleteHandle(scope.row.studentSignId)">删除</el-button>
+          <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
+          <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -120,7 +144,7 @@
             'key': this.dataForm.key
           })
         }).then(({data}) => {
-          if (data && data.code === 0) {
+          if (data && data.code === 200) {
             this.dataList = data.page.list
             this.totalPage = data.page.totalCount
           } else {
@@ -155,7 +179,7 @@
       // 删除
       deleteHandle (id) {
         var ids = id ? [id] : this.dataListSelections.map(item => {
-          return item.studentSignId
+          return item.id
         })
         this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '删除' : '批量删除'}]操作?`, '提示', {
           confirmButtonText: '确定',
@@ -167,7 +191,7 @@
             method: 'post',
             data: this.$http.adornData(ids, false)
           }).then(({data}) => {
-            if (data && data.code === 0) {
+            if (data && data.code === 200) {
               this.$message({
                 message: '操作成功',
                 type: 'success',
