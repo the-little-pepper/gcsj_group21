@@ -14,7 +14,7 @@
       <el-input v-model="dataForm.code" placeholder="字典码"></el-input>
     </el-form-item>
     <el-form-item label="字典值" prop="value">
-      <el-input v-model="dataForm.value" placeholder="字典值"></el-input>
+      <el-input v-model="dataForm.value" placeholder="字典值" required></el-input>
     </el-form-item>
     <el-form-item label="排序" prop="orderNum">
       <el-input v-model="dataForm.orderNum" placeholder="排序"></el-input>
@@ -22,11 +22,16 @@
     <el-form-item label="备注" prop="remark">
       <el-input v-model="dataForm.remark" placeholder="备注"></el-input>
     </el-form-item>
+    <!--
     <el-form-item label="删除标记 -1:已删除" prop="delFlag">
       <el-input v-model="dataForm.delFlag" placeholder="删除标记 -1:已删除"></el-input>
     </el-form-item>
-    <el-form-item label="0 禁用 1正常" prop="status">
-      <el-input v-model="dataForm.status" placeholder="0 禁用 1正常"></el-input>
+    -->
+    <el-form-item label="状态" prop="status">
+      <el-radio-group  v-model="dataForm.status">
+        <el-radio class="radio" :label="1" :key="1">正常</el-radio>
+        <el-radio class="radio" :label="0" :key="0">禁用</el-radio>
+      </el-radio-group>
     </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
@@ -39,6 +44,34 @@
 <script>
   export default {
     data () {
+      const paramKeyValidator = async (rule, value, callback) => {
+        if (!value) {
+          return callback(new Error('字典值不能为空'))
+        }
+        // 获取系统参数
+        const {data} = await this.$http({
+          url: this.$http.adornUrl('/sysdict/list'),
+          method: 'get',
+          params: this.$http.adornParams({
+            'page': this.pageIndex,
+            'limit': 300,
+            'key': this.dataForm.key
+          })
+        })
+        let isRepeat = false
+        for (let item of data.page.list) {
+          if (value === item.value && this.dataForm.code === item.code && this.dataForm.type === item.type) {
+            isRepeat = true
+            break
+          }
+        }
+
+        if (isRepeat && !this.dataForm.id) {
+          return callback(new Error('字典值重复'))
+        } else {
+          return callback()
+        }
+      }
       return {
         visible: false,
         dataForm: {
@@ -47,10 +80,10 @@
           type: '',
           code: '',
           value: '',
-          orderNum: '',
-          remark: '',
-          delFlag: '',
-          status: ''
+          orderNum: '0',
+          remark: '无',
+          delFlag: '0',
+          status: 1
         },
         dataRule: {
           name: [
@@ -63,13 +96,13 @@
             { required: true, message: '字典码不能为空', trigger: 'blur' }
           ],
           value: [
-            { required: true, message: '字典值不能为空', trigger: 'blur' }
+            { required: true, validator: paramKeyValidator, trigger: 'blur' }
           ],
           orderNum: [
-            { required: true, message: '排序不能为空', trigger: 'blur' }
+            { required: false, trigger: 'blur' }
           ],
           remark: [
-            { required: true, message: '备注不能为空', trigger: 'blur' }
+            { trigger: 'blur' }
           ],
           delFlag: [
             { required: true, message: '删除标记 -1:已删除不能为空', trigger: 'blur' }

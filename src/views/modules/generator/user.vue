@@ -156,9 +156,15 @@
     },
     methods: {
       formatSex: function (row, column) {
+        if (!this.sysdict['sex_type'] || !this.sysdict['sex_type'][row.sex]) {
+          return ''
+        }
         return this.sysdict['sex_type'][row.sex]
       },
       formatUsertype: function (row, column) {
+        if (!this.sysdict['user_type'] || !this.sysdict['user_type'][row.userType]) {
+          return ''
+        }
         return this.sysdict['user_type'][row.userType]
       },
       // 获取数据列表

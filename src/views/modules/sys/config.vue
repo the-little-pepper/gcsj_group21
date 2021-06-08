@@ -2,7 +2,7 @@
   <div class="mod-config">
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
       <el-form-item>
-        <el-input v-model="dataForm.paramKey" placeholder="参数名" clearable></el-input>
+        <el-input v-model="dataForm.remark" placeholder="参数关键字" clearable></el-input>
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
@@ -30,22 +30,22 @@
         label="ID">
       </el-table-column>
       <el-table-column
+        prop="remark"
+        header-align="center"
+        align="center"
+        label="参数名称">
+      </el-table-column>
+      <el-table-column
         prop="paramKey"
         header-align="center"
         align="center"
-        label="参数名">
+        label="参数关键字">
       </el-table-column>
       <el-table-column
         prop="paramValue"
         header-align="center"
         align="center"
         label="参数值">
-      </el-table-column>
-      <el-table-column
-        prop="remark"
-        header-align="center"
-        align="center"
-        label="备注">
       </el-table-column>
       <el-table-column
         fixed="right"
@@ -79,7 +79,7 @@
     data () {
       return {
         dataForm: {
-          paramKey: ''
+          remark: ''
         },
         dataList: [],
         pageIndex: 1,
@@ -106,7 +106,7 @@
           params: this.$http.adornParams({
             'page': this.pageIndex,
             'limit': this.pageSize,
-            'paramKey': this.dataForm.paramKey
+            'paramKey': this.dataForm.remark
           })
         }).then(({data}) => {
           if (data && data.code === 200) {
@@ -146,7 +146,7 @@
         var ids = id ? [id] : this.dataListSelections.map(item => {
           return item.id
         })
-        this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '删除' : '批量删除'}]操作?`, '提示', {
+        this.$confirm(`确定进行[${id ? '删除' : '批量删除'}]操作?`, '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'

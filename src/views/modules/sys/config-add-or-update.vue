@@ -4,14 +4,14 @@
     :close-on-click-modal="false"
     :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
-      <el-form-item label="参数名" prop="paramKey">
-        <el-input v-model="dataForm.paramKey" placeholder="参数名"></el-input>
+      <el-form-item label="参数名" prop="remark">
+        <el-input v-model="dataForm.remark" placeholder="参数名称"></el-input>
+      </el-form-item>
+      <el-form-item label="关键字" prop="paramKey" required>
+        <el-input v-model="dataForm.paramKey" placeholder="参数关键字"></el-input>
       </el-form-item>
       <el-form-item label="参数值" prop="paramValue">
         <el-input v-model="dataForm.paramValue" placeholder="参数值"></el-input>
-      </el-form-item>
-      <el-form-item label="备注" prop="remark">
-        <el-input v-model="dataForm.remark" placeholder="备注"></el-input>
       </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
@@ -24,6 +24,34 @@
 <script>
   export default {
     data () {
+      const paramKeyValidator = async (rule, value, callback) => {
+        if (!value) {
+          return callback(new Error('参数关键字不能为空'))
+        }
+        // 获取系统参数
+        const {data} = await this.$http({
+          url: this.$http.adornUrl('/sys/config/list'),
+          method: 'get',
+          params: this.$http.adornParams({
+            'page': this.pageIndex,
+            'limit': 300,
+            'key': this.dataForm.key
+          })
+        })
+        let isRepeat = false
+        for (let item of data.page.list) {
+          if (value === item.paramKey) {
+            isRepeat = true
+            break
+          }
+        }
+
+        if (isRepeat && !this.dataForm.id) {
+          return callback(new Error('参数关键字重复'))
+        } else {
+          return callback()
+        }
+      }
       return {
         visible: false,
         dataForm: {
@@ -34,10 +62,13 @@
         },
         dataRule: {
           paramKey: [
-            { required: true, message: '参数名不能为空', trigger: 'blur' }
+            { required: true, validator: paramKeyValidator, trigger: 'blur' }
           ],
           paramValue: [
             { required: true, message: '参数值不能为空', trigger: 'blur' }
+          ],
+          remark: [
+            { required: true, message: '参数名称不能为空', trigger: 'blur' }
           ]
         }
       }

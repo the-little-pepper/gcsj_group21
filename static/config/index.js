@@ -5,7 +5,8 @@
   window.SITE_CONFIG = {};
 
   // api接口请求地址
-  window.SITE_CONFIG['baseUrl'] = 'http://3l5a371571.qicp.vip/renren-fast';
+  // window.SITE_CONFIG['baseUrl'] = 'http://3l5a371571.qicp.vip/renren-fast';
+  window.SITE_CONFIG['baseUrl'] = 'http://121.5.102.246:8080/renren-fast';
 
   // cdn地址 = 域名 + 版本号
   window.SITE_CONFIG['domain']  = './'; // 域名

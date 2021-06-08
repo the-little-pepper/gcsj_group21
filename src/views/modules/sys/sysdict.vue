@@ -2,7 +2,7 @@
   <div class="mod-config">
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
       <el-form-item>
-        <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
+        <el-input v-model="dataForm.key" placeholder="字典名称" clearable></el-input>
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
@@ -64,12 +64,14 @@
         align="center"
         label="备注">
       </el-table-column>
+      <!--
       <el-table-column
         prop="delFlag"
         header-align="center"
         align="center"
         label="删除标记 -1:已删除">
       </el-table-column>
+      -->
       <el-table-column
         prop="status"
         header-align="center"
