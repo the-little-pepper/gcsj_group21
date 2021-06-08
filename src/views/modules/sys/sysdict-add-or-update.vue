@@ -60,7 +60,7 @@
         })
         let isRepeat = false
         for (let item of data.page.list) {
-          if (value === item.value && this.dataForm.code === item.code && this.dataForm.type === item.type) {
+          if (value === item.value && this.dataForm.type === item.type) {
             isRepeat = true
             break
           }
