@@ -46,7 +46,7 @@
     data () {
       const paramKeyValidator = async (rule, value, callback) => {
         if (!value) {
-          return callback(new Error('字典值不能为空'))
+          return callback(new Error('字典码不能为空'))
         }
         // 获取系统参数
         const {data} = await this.$http({
@@ -60,14 +60,14 @@
         })
         let isRepeat = false
         for (let item of data.page.list) {
-          if (value === item.value && this.dataForm.type === item.type) {
+          if (value === item.code && this.dataForm.type === item.type) {
             isRepeat = true
             break
           }
         }
 
         if (isRepeat && !this.dataForm.id) {
-          return callback(new Error('字典值重复'))
+          return callback(new Error('字典码重复'))
         } else {
           return callback()
         }
@@ -93,10 +93,10 @@
             { required: true, message: '字典类型不能为空', trigger: 'blur' }
           ],
           code: [
-            { required: true, message: '字典码不能为空', trigger: 'blur' }
+            { required: true, validator: paramKeyValidator, trigger: 'blur' }
           ],
           value: [
-            { required: true, validator: paramKeyValidator, trigger: 'blur' }
+            { required: true, message: '字典值不能为空', trigger: 'blur' }
           ],
           orderNum: [
             { required: false, trigger: 'blur' }
