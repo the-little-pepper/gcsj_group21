@@ -22,24 +22,27 @@
         align="center"
         width="50">
       </el-table-column>
-      <el-table-column
-        prop="id"
-        header-align="center"
-        align="center"
-        label="">
-      </el-table-column>
+      <!--
+        <el-table-column
+          prop="id"
+          header-align="center"
+          align="center"
+          label="">
+        </el-table-column>
+      -->
       <el-table-column
         prop="name"
         header-align="center"
         align="center"
-        label="字典名称">
+        label="名称">
       </el-table-column>
       <el-table-column
         prop="type"
         header-align="center"
         align="center"
-        label="字典类型">
+        label="关键字">
       </el-table-column>
+      <!--
       <el-table-column
         prop="code"
         header-align="center"
@@ -58,6 +61,7 @@
         align="center"
         label="排序">
       </el-table-column>
+      -->
       <el-table-column
         prop="remark"
         header-align="center"
@@ -140,13 +144,25 @@
           method: 'get',
           params: this.$http.adornParams({
             'page': this.pageIndex,
-            'limit': this.pageSize,
+            'limit': 1000,
             'key': this.dataForm.key
           })
         }).then(({data}) => {
           if (data && data.code === 200) {
-            this.dataList = data.page.list
-            this.totalPage = data.page.totalCount
+            this.dataList = []
+            let count = 0
+            for (let item of data.page.list) {
+              if (item.delFlag === 88) {
+                if (count >= (this.pageIndex - 1) * this.pageSize && count < (this.pageIndex) * this.pageSize) {
+                  this.dataList.push(item)
+                }
+                count++
+              }
+            }
+            this.totalPage = count
+            // this.dataList = data.page.list
+            // this.totalPage = data.page.totalCount
+            console.log(this.totalPage)
           } else {
             this.dataList = []
             this.totalPage = 0
