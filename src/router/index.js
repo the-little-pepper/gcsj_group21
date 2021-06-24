@@ -62,6 +62,7 @@ router.beforeEach((to, from, next) => {
   // 1. 已经添加 or 全局路由, 直接访问
   // 2. 获取菜单列表, 添加并保存本地存储
   let url = window.location.href
+  console.log(url)
   if (!url.startsWith('http://') && !url.startsWith('https://')) {
     console.log(`url解析不是http或https协议，重新跳转登录页`)
     router.push({ name: 'login' })

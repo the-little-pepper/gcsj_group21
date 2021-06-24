@@ -1,6 +1,6 @@
 <template>
   <div class="mod-config">
-    <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
+    <!-- <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
       <el-form-item>
         <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
       </el-form-item>
@@ -9,19 +9,24 @@
         <el-button v-if="isAuth('generator:clastudentsign:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
         <el-button v-if="isAuth('generator:clastudentsign:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
-    </el-form>
-    <el-table
+    </el-form> -->
+    <!-- <el-table
       :data="dataList"
       border
       v-loading="dataListLoading"
       @selection-change="selectionChangeHandle"
+      style="width: 100%;"> -->
+    <el-table
+      :data="dataList"
+      border
+      v-loading="dataListLoading"
       style="width: 100%;">
-      <el-table-column
+      <!-- <el-table-column
         type="selection"
         header-align="center"
         align="center"
         width="50">
-      </el-table-column>
+      </el-table-column> -->
       <el-table-column
         prop="id"
         header-align="center"
@@ -82,7 +87,7 @@
         align="center"
         label="备注">
       </el-table-column>
-      <el-table-column
+      <!-- <el-table-column
         fixed="right"
         header-align="center"
         align="center"
@@ -92,7 +97,7 @@
           <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
           <el-button type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
         </template>
-      </el-table-column>
+      </el-table-column> -->
     </el-table>
     <el-pagination
       @size-change="sizeChangeHandle"

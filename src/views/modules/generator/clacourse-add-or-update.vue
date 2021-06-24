@@ -1,43 +1,47 @@
 <template>
   <el-dialog
-    :title="!dataForm.id ? '新增' : '修改'"
+    :title="!dataForm.courseId ? '新增' : '修改'"
     :close-on-click-modal="false"
     :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
     <el-form-item label="课程名称" prop="courseName">
-      <el-input v-model="dataForm.courseName" placeholder="课程名称"></el-input>
+      <el-input v-model="dataForm.courseName" placeholder="课程名称" :disabled="true"></el-input>
     </el-form-item>
     <el-form-item label="班课号" prop="courseNum">
-      <el-input v-model="dataForm.courseNum" placeholder="班课号"></el-input>
+      <el-input v-model="dataForm.courseNum" placeholder="班课号" :disabled="true"></el-input>
     </el-form-item>
     <el-form-item label="班级名称" prop="className">
-      <el-input v-model="dataForm.className" placeholder="班级名称"></el-input>
-    </el-form-item>
-    <el-form-item label="班课封面" prop="coursePage">
-      <el-input v-model="dataForm.coursePage" placeholder="班课封面"></el-input>
+      <el-input v-model="dataForm.className" placeholder="班级名称" :disabled="true"></el-input>
     </el-form-item>
     <el-form-item label="学期" prop="semester">
-      <el-input v-model="dataForm.semester" placeholder="学期"></el-input>
+      <el-input v-model="dataForm.semester" placeholder="学期" :disabled="true"></el-input>
     </el-form-item>
-    <el-form-item label="学校课表班课" prop="curriculum">
+    <!-- <el-form-item label="学校课表班课" prop="curriculum">
       <el-input v-model="dataForm.curriculum" placeholder="学校课表班课"></el-input>
     </el-form-item>
     <el-form-item label="云教材" prop="textbook">
       <el-input v-model="dataForm.textbook" placeholder="云教材"></el-input>
-    </el-form-item>
-    <el-form-item label="学校院系ID" prop="uniacadaId">
-      <el-input v-model="dataForm.uniacadaId" placeholder="学校院系ID"></el-input>
+    </el-form-item> -->
+    <el-form-item label="学校院系" prop="uniacadaId">
+      <el-input v-model="schools[dataForm.uniacadaId]" placeholder="学校院系ID" :disabled="true"></el-input>
     </el-form-item>
     <el-form-item label="学习要求" prop="studyRequirement">
       <el-input v-model="dataForm.studyRequirement" placeholder="学习要求"></el-input>
     </el-form-item>
-    <el-form-item label="教学进度" prop="lectureProgress">
-      <el-input v-model="dataForm.lectureProgress" placeholder="教学进度"></el-input>
-    </el-form-item>
     <el-form-item label="考试安排" prop="examArrangement">
       <el-input v-model="dataForm.examArrangement" placeholder="考试安排"></el-input>
     </el-form-item>
-    <el-form-item label="创建者" prop="createBy">
+    <el-form-item label="状态" prop="status">
+      <el-radio-group  v-model="dataForm.status">
+        <el-radio v-for="(name, i) in statustypes" class="radio" :label="i" :key="i">{{name}}</el-radio>
+      </el-radio-group>
+    </el-form-item>
+    <el-form-item label="教学进度" prop="overs">
+      <el-radio-group  v-model="dataForm.overs">
+        <el-radio v-for="(name, i) in overstypes" class="radio" :label="i" :key="i">{{name}}</el-radio>
+      </el-radio-group>
+    </el-form-item>
+    <!-- <el-form-item label="创建者" prop="createBy">
       <el-input v-model="dataForm.createBy" placeholder="创建者"></el-input>
     </el-form-item>
     <el-form-item label="创建时间" prop="createTime">
@@ -48,7 +52,7 @@
     </el-form-item>
     <el-form-item label="更新时间" prop="updateTime">
       <el-input v-model="dataForm.updateTime" placeholder="更新时间"></el-input>
-    </el-form-item>
+    </el-form-item> -->
     <el-form-item label="备注" prop="remark">
       <el-input v-model="dataForm.remark" placeholder="备注"></el-input>
     </el-form-item>
@@ -64,19 +68,20 @@
   export default {
     data () {
       return {
+        statustypes: {1: '不能加入', 0: '允许加入'},
+        overstypes: {1: '已结束', 0: '进行中'},
+        schools: [],
         visible: false,
         dataForm: {
           courseId: 0,
           courseName: '',
           courseNum: '',
           className: '',
-          coursePage: '',
+          status: '',
           semester: '',
-          curriculum: '',
-          textbook: '',
           uniacadaId: '',
           studyRequirement: '',
-          lectureProgress: '',
+          overs: '',
           examArrangement: '',
           createBy: '',
           createTime: '',
@@ -94,20 +99,14 @@
           className: [
             { required: true, message: '班级名称不能为空', trigger: 'blur' }
           ],
-          coursePage: [
+          status: [
             { required: true, message: '班课封面不能为空', trigger: 'blur' }
           ],
           semester: [
             { required: true, message: '学期不能为空', trigger: 'blur' }
           ],
-          curriculum: [
-            { required: true, message: '学校课表班课不能为空', trigger: 'blur' }
-          ],
-          textbook: [
-            { required: true, message: '云教材不能为空', trigger: 'blur' }
-          ],
           uniacadaId: [
-            { required: true, message: '学校院系ID不能为空', trigger: 'blur' }
+            { required: true, message: '学校院系不能为空', trigger: 'change' }
           ],
           studyRequirement: [
             { required: true, message: '学习要求不能为空', trigger: 'blur' }
@@ -137,7 +136,19 @@
       }
     },
     methods: {
-      init (id) {
+      async init (id) {
+        const {data} = await this.$http({
+          url: this.$http.adornUrl('/generator/school/list'),
+          method: 'get',
+          params: this.$http.adornParams({
+            'page': 0,
+            'limit': 200
+          })
+        })
+        for (let item of data) {
+          this.schools[item.menuId] = item.parentName + ' ' + item.name
+        }
+
         this.dataForm.courseId = id || 0
         this.visible = true
         this.$nextTick(() => {
@@ -152,13 +163,11 @@
                 this.dataForm.courseName = data.claCourse.courseName
                 this.dataForm.courseNum = data.claCourse.courseNum
                 this.dataForm.className = data.claCourse.className
-                this.dataForm.coursePage = data.claCourse.coursePage
+                this.dataForm.status = data.claCourse.status.toString()
                 this.dataForm.semester = data.claCourse.semester
-                this.dataForm.curriculum = data.claCourse.curriculum
-                this.dataForm.textbook = data.claCourse.textbook
                 this.dataForm.uniacadaId = data.claCourse.uniacadaId
                 this.dataForm.studyRequirement = data.claCourse.studyRequirement
-                this.dataForm.lectureProgress = data.claCourse.lectureProgress
+                this.dataForm.overs = data.claCourse.overs.toString()
                 this.dataForm.examArrangement = data.claCourse.examArrangement
                 this.dataForm.createBy = data.claCourse.createBy
                 this.dataForm.createTime = data.claCourse.createTime
@@ -174,6 +183,7 @@
       dataFormSubmit () {
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
+            var dateFormat = require('dateformat')
             this.$http({
               url: this.$http.adornUrl(`/generator/clacourse/${!this.dataForm.courseId ? 'save' : 'update'}`),
               method: 'post',
@@ -182,18 +192,16 @@
                 'courseName': this.dataForm.courseName,
                 'courseNum': this.dataForm.courseNum,
                 'className': this.dataForm.className,
-                'coursePage': this.dataForm.coursePage,
+                'status': this.dataForm.status,
                 'semester': this.dataForm.semester,
-                'curriculum': this.dataForm.curriculum,
-                'textbook': this.dataForm.textbook,
                 'uniacadaId': this.dataForm.uniacadaId,
                 'studyRequirement': this.dataForm.studyRequirement,
-                'lectureProgress': this.dataForm.lectureProgress,
+                'overs': this.dataForm.overs,
                 'examArrangement': this.dataForm.examArrangement,
                 'createBy': this.dataForm.createBy,
                 'createTime': this.dataForm.createTime,
                 'updateBy': this.dataForm.updateBy,
-                'updateTime': this.dataForm.updateTime,
+                'updateTime': dateFormat(new Date(), 'yyyy-mm-dd HH:MM:ss'),
                 'remark': this.dataForm.remark
               })
             }).then(({data}) => {

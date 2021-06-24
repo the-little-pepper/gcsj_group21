@@ -2,12 +2,12 @@
   <div class="mod-config">
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
       <el-form-item>
-        <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
+        <el-input v-model="dataForm.key" placeholder="班课号" clearable></el-input>
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
-        <el-button v-if="isAuth('generator:clacourse:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
-        <el-button v-if="isAuth('generator:clacourse:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
+        <!-- <el-button v-if="isAuth('generator:clacourse:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
+        <el-button v-if="isAuth('generator:clacourse:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button> -->
       </el-form-item>
     </el-form>
     <el-table
@@ -16,12 +16,12 @@
       v-loading="dataListLoading"
       @selection-change="selectionChangeHandle"
       style="width: 100%;">
-      <el-table-column
+      <!-- <el-table-column
         type="selection"
         header-align="center"
         align="center"
         width="50">
-      </el-table-column>
+      </el-table-column> -->
       <el-table-column
         prop="courseId"
         header-align="center"
@@ -47,10 +47,11 @@
         label="班级名称">
       </el-table-column>
       <el-table-column
-        prop="coursePage"
+        prop="status"
         header-align="center"
         align="center"
-        label="班课封面">
+        :formatter="formatStatus"
+        label="状态">
       </el-table-column>
       <el-table-column
         prop="semester"
@@ -58,23 +59,24 @@
         align="center"
         label="学期">
       </el-table-column>
-      <el-table-column
+      <!-- <el-table-column
         prop="curriculum"
         header-align="center"
         align="center"
         label="学校课表班课">
-      </el-table-column>
-      <el-table-column
+      </el-table-column> -->
+      <!-- <el-table-column
         prop="textbook"
         header-align="center"
         align="center"
-        label="云教材">
+        label="云教材"> -->
       </el-table-column>
       <el-table-column
         prop="uniacadaId"
         header-align="center"
         align="center"
-        label="学校院系ID">
+        :formatter="formatUniacada"
+        label="学校院系">
       </el-table-column>
       <el-table-column
         prop="studyRequirement"
@@ -83,9 +85,10 @@
         label="学习要求">
       </el-table-column>
       <el-table-column
-        prop="lectureProgress"
+        prop="overs"
         header-align="center"
         align="center"
+        :formatter="formatOvers"
         label="教学进度">
       </el-table-column>
       <el-table-column
@@ -132,7 +135,7 @@
         label="操作">
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.courseId)">修改</el-button>
-          <el-button type="text" size="small" @click="deleteHandle(scope.row.courseId)">删除</el-button>
+          <!-- <el-button type="text" size="small" @click="deleteHandle(scope.row.courseId)">删除</el-button> -->
         </template>
       </el-table-column>
     </el-table>
@@ -164,6 +167,7 @@
         totalPage: 0,
         dataListLoading: false,
         dataListSelections: [],
+        schools: {},
         addOrUpdateVisible: false
       }
     },
@@ -174,9 +178,31 @@
       this.getDataList()
     },
     methods: {
+      formatUniacada: function (row, column) {
+        return this.schools[row.uniacadaId]
+      },
+      formatStatus: function (row, column) {
+        return row.status === 0 ? '允许加入' : '不能加入'
+      },
+      formatOvers: function (row, column) {
+        return row.status === 0 ? '进行中' : '结束'
+      },
       // 获取数据列表
-      getDataList () {
+      async getDataList () {
         this.dataListLoading = true
+
+        const {data} = await this.$http({
+          url: this.$http.adornUrl('/generator/school/list'),
+          method: 'get',
+          params: this.$http.adornParams({
+            'page': 0,
+            'limit': 200
+          })
+        })
+        for (let item of data) {
+          this.schools[item.menuId] = item.parentName + ' ' + item.name
+        }
+
         this.$http({
           url: this.$http.adornUrl('/generator/clacourse/list'),
           method: 'get',

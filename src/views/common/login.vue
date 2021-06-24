@@ -185,7 +185,8 @@
           url: this.$http.adornUrl('/app/user/checkCode'),
           method: 'post',
           data: this.$http.adornData({
-            'phonenumber': this.dataForm.userName
+            'phonenumber': this.dataForm.userName,
+            'type': '2'
           })
         }).then(({data}) => {
           if (data && data.code === 200) {

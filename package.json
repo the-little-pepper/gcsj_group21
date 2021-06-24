@@ -4,14 +4,18 @@
   "description": "",
   "author": "group21",
   "private": true,
+  "main": "src/.electron-prod.js",
   "scripts": {
     "dev": "webpack-dev-server --inline --progress --config build/webpack.dev.conf.js",
     "start": "npm run dev",
+    "electron_dev": "electron src/.electron.js",
+    "electron_build": "electron-packager ./ --platform=win32 --arch=x64 --overwrite",
     "unit": "jest --config test/unit/jest.conf.js --coverage",
     "e2e": "node test/e2e/runner.js",
     "test": "npm run unit && npm run e2e",
     "lint": "eslint --ext .js,.vue src test/unit/specs test/e2e/specs",
-    "build": "gulp"
+    "build": "gulp",
+    "build_deploy": "rmdir /s /q dist && gulp && python ..\\test\\deploy.py"
   },
   "dependencies": {
     "axios": "0.17.1",
@@ -53,6 +57,8 @@
     "copy-webpack-plugin": "4.0.1",
     "cross-spawn": "5.0.1",
     "css-loader": "0.28.0",
+    "electron": "^13.1.2",
+    "electron-packager": "^15.2.0",
     "eslint": "3.19.0",
     "eslint-config-standard": "10.2.1",
     "eslint-friendly-formatter": "3.0.0",
@@ -67,6 +73,7 @@
     "file-loader": "1.1.4",
     "friendly-errors-webpack-plugin": "1.6.1",
     "html-webpack-plugin": "2.30.1",
+    "http-server": "^0.12.3",
     "jest": "21.2.0",
     "jest-serializer-vue": "0.3.0",
     "nightwatch": "0.9.12",
