@@ -5,19 +5,23 @@
     :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
     <el-form-item label="用户表id" prop="userId">
-      <el-input v-model="dataForm.userId" placeholder="用户表id"></el-input>
+      <el-input v-model="dataForm.userId" placeholder="用户表id" :disabled="dataForm.id !== 0"></el-input>
     </el-form-item>
-    <el-form-item label="账号类型 1 手机号 2邮箱 3 用户名" prop="type">
-      <el-input v-model="dataForm.type" placeholder="账号类型 1 手机号 2邮箱 3 用户名"></el-input>
+    <el-form-item label="账号类型" prop="type">
+      <el-radio-group  v-model="dataForm.type" :disabled="dataForm.id !== 0">
+        <el-radio v-for="(name, i) in acctypes" class="radio" :label="i" :key="i">{{name}}</el-radio>
+      </el-radio-group>
     </el-form-item>
-    <el-form-item label="用户名包括邮箱手机号等" prop="userName">
-      <el-input v-model="dataForm.userName" placeholder="用户名包括邮箱手机号等"></el-input>
+    <el-form-item label="用户名" prop="userName">
+      <el-input v-model="dataForm.userName" placeholder="用户名"></el-input>
     </el-form-item>
     <el-form-item label="密码" prop="password">
       <el-input v-model="dataForm.password" placeholder="密码"></el-input>
     </el-form-item>
-    <el-form-item label="禁用标志 0禁用 1正常" prop="status">
-      <el-input v-model="dataForm.status" placeholder="禁用标志 0禁用 1正常"></el-input>
+    <el-form-item label="状态" prop="status">
+      <el-radio-group  v-model="dataForm.status">
+        <el-radio v-for="(name, i) in statustypes" class="radio" :label="i" :key="i">{{name}}</el-radio>
+      </el-radio-group>
     </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
@@ -32,6 +36,8 @@
     data () {
       return {
         visible: false,
+        acctypes: {1: '手机号', 2: '邮箱', 3: '用户名'},
+        statustypes: {1: '正常', 0: '禁用'},
         dataForm: {
           id: 0,
           userId: '',
@@ -45,7 +51,7 @@
             { required: true, message: '用户表id不能为空', trigger: 'blur' }
           ],
           type: [
-            { required: true, message: '账号类型 1 手机号 2邮箱 3 用户名不能为空', trigger: 'blur' }
+            { required: true, message: '账号类型不能为空', trigger: 'blur' }
           ],
           userName: [
             { required: true, message: '用户名包括邮箱手机号等不能为空', trigger: 'blur' }
@@ -54,7 +60,7 @@
             { required: true, message: '密码不能为空', trigger: 'blur' }
           ],
           status: [
-            { required: true, message: '禁用标志 0禁用 1正常不能为空', trigger: 'blur' }
+            { required: true, message: '禁用标志不能为空', trigger: 'blur' }
           ]
         }
       }
@@ -73,10 +79,10 @@
             }).then(({data}) => {
               if (data && data.code === 200) {
                 this.dataForm.userId = data.account.userId
-                this.dataForm.type = data.account.type
+                this.dataForm.type = data.account.type.toString()
                 this.dataForm.userName = data.account.userName
                 this.dataForm.password = data.account.password
-                this.dataForm.status = data.account.status
+                this.dataForm.status = data.account.status.toString()
               }
             })
           }

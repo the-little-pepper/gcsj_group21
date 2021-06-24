@@ -1,13 +1,20 @@
 <template>
   <div class="mod-config">
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
-      <el-form-item>
-        <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
+      <el-form-item label="账号类型">
+        <!-- <el-input v-model="dataForm.key" placeholder="账号类型" clearable></el-input> -->
+          <el-select v-model="dataForm.key" placeholder="请选择" @change="getDataList()">
+            <el-option
+              v-for="item in keystypes"
+              :key="item.id"
+              :label="item.name"
+              :value="item.value"/>
+          </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button @click="getDataList()">查询</el-button>
-        <el-button v-if="isAuth('generator:account:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
-        <el-button v-if="isAuth('generator:account:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
+        <!-- <el-button @click="getDataList()">查询</el-button> -->
+        <!-- <el-button v-if="isAuth('generator:account:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button> -->
+        <!-- <el-button v-if="isAuth('generator:account:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button> -->
       </el-form-item>
     </el-form>
     <el-table
@@ -91,6 +98,12 @@
   export default {
     data () {
       return {
+        keystypes: [
+          {id: 1, name: '全部类型', value: ''},
+          {id: 2, name: '手机号', value: '1'},
+          {id: 3, name: '邮箱', value: '2'},
+          {id: 4, name: '用户名', value: '3'}
+        ],
         dataForm: {
           key: ''
         },
@@ -131,9 +144,11 @@
           })
         })
         for (let item of data.page.list) {
-          console.log(item.code, item.type, item.value)
           if (!this.sysdict[item.type]) {
             this.sysdict[item.type] = {}
+          }
+          if (item.delFlag === 88) {
+            continue
           }
           this.sysdict[item.type][item.code] = item.value
         }
