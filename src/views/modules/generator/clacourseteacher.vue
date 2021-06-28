@@ -40,10 +40,11 @@
         label="发起签到次数">
       </el-table-column>
       <el-table-column
+        v-if="exp !== ''"
         prop="fullExp"
         header-align="center"
         align="center"
-        label="满经验值">
+        label="经验值">
       </el-table-column>
       <el-table-column
         prop="createBy"
@@ -106,6 +107,7 @@
   export default {
     data () {
       return {
+        exp: '',
         dataForm: {
           key: ''
         },
@@ -125,9 +127,31 @@
       this.getDataList()
     },
     methods: {
+      async getExpPerSign () {
+        let {data} = await this.$http({
+          url: this.$http.adornUrl('/sys/config/list'),
+          method: 'get',
+          params: this.$http.adornParams({
+            'page': 0,
+            'limit': 300
+          })
+        })
+        let res = []
+        if (data && data.code === 200) {
+          res = data.page.list
+        }
+        for (let item of res) {
+          if (item.paramKey === 'experience') {
+            this.exp = await item.paramValue
+            return
+          }
+        }
+      },
       // 获取数据列表
-      getDataList () {
+      async getDataList () {
         this.dataListLoading = true
+        await this.getExpPerSign()
+
         this.$http({
           url: this.$http.adornUrl('/generator/clacourseteacher/list'),
           method: 'get',
@@ -140,6 +164,9 @@
           if (data && data.code === 200) {
             this.dataList = data.page.list
             this.totalPage = data.page.totalCount
+            for (let item of this.dataList) {
+              item.fullExp = item.sign * this.exp
+            }
           } else {
             this.dataList = []
             this.totalPage = 0

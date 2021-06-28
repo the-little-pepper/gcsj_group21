@@ -185,7 +185,7 @@
         return row.status === 0 ? '允许加入' : '不能加入'
       },
       formatOvers: function (row, column) {
-        return row.status === 0 ? '进行中' : '结束'
+        return row.overs === 0 ? '进行中' : '结束'
       },
       // 获取数据列表
       async getDataList () {

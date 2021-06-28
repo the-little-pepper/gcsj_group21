@@ -23,13 +23,17 @@
       <el-input v-model="dataForm.textbook" placeholder="云教材"></el-input>
     </el-form-item> -->
     <el-form-item label="学校院系" prop="uniacadaId">
-      <el-input v-model="schools[dataForm.uniacadaId]" placeholder="学校院系ID" :disabled="true"></el-input>
+      <el-input v-model="schools[dataForm.uniacadaId]" placeholder="学校院系" :disabled="true"></el-input>
     </el-form-item>
     <el-form-item label="学习要求" prop="studyRequirement">
       <el-input v-model="dataForm.studyRequirement" placeholder="学习要求"></el-input>
     </el-form-item>
     <el-form-item label="考试安排" prop="examArrangement">
-      <el-input v-model="dataForm.examArrangement" placeholder="考试安排"></el-input>
+      <el-date-picker
+          v-model="dataForm.examArrangement"
+          placeholder="年/月/日"
+          value-format="yyyy-MM-dd" />
+      <!-- <el-input v-model="dataForm.examArrangement" placeholder="考试安排"></el-input> -->
     </el-form-item>
     <el-form-item label="状态" prop="status">
       <el-radio-group  v-model="dataForm.status">

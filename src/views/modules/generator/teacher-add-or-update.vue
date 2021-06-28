@@ -88,6 +88,7 @@
         return callback()
       }
       return {
+        schools: {},
         visible: false,
         dataForm: {
           userId: 0,
@@ -157,9 +158,25 @@
       }
     },
     methods: {
+      getSchools () {
+        this.$http({
+          url: this.$http.adornUrl('/generator/school/list'),
+          method: 'get',
+          params: this.$http.adornParams({
+            'page': 0,
+            'limit': 200
+          })
+        }).then(({data}) => {
+          this.menuList = treeDataTranslate(data, 'menuId')
+          for (let item of data) {
+            this.schools[item.menuId] = item.parentName + ' ' + item.name
+          }
+          this.dataForm.parentName = this.dataForm.uniacadaId === '' ? '' : this.schools[this.dataForm.uniacadaId]
+        })
+      },
       async init (id) {
         // 获得数据字典
-        const {data} = await this.$http({
+        let {data} = await this.$http({
           url: this.$http.adornUrl('/sysdict/list'),
           method: 'get',
           params: this.$http.adornParams({
@@ -178,13 +195,7 @@
           this.sysdict[item.type][item.code] = item.value
         }
 
-        this.$http({
-          url: this.$http.adornUrl('/generator/school/list'),
-          method: 'get',
-          params: this.$http.adornParams()
-        }).then(({data}) => {
-          this.menuList = treeDataTranslate(data, 'menuId')
-        })
+        this.getSchools()
 
         this.dataForm.userId = id || 0
         this.visible = true
@@ -210,6 +221,7 @@
                 this.dataForm.updateTime = data.user.updateTime
                 this.dataForm.updateBy = data.user.updateBy
                 this.dataForm.remark = data.user.remark
+
               }
             })
           }
